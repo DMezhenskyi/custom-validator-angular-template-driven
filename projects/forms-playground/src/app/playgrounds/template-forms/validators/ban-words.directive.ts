@@ -1,9 +1,8 @@
-import { Directive, Input } from '@angular/core';
+import { afterRenderEffect, Directive, input, untracked } from '@angular/core';
 import { AbstractControl, ValidationErrors, Validator, NG_VALIDATORS } from '@angular/forms';
 
 @Directive({
   selector: '[appBanWords]',
-  standalone: true,
   providers: [
     {
       provide: NG_VALIDATORS,
@@ -14,19 +13,22 @@ import { AbstractControl, ValidationErrors, Validator, NG_VALIDATORS } from '@an
 })
 export class BanWordsDirective implements Validator {
 
-  @Input()
-  set appBanWords(value: string | string[]) {
-    this.bannedWords = Array.isArray(value) ? value : [value];
-    this.onChange();
-  }
-  private bannedWords: string[] = [];
+  appBanWords = input<string[], string | string[]>([], {
+    transform: (value) => Array.isArray(value) ? value : [value],
+  });
 
   private onChange: () => void = () => {}
-
-  constructor() { }
+  
+  constructor() {
+    afterRenderEffect(() => {
+      this.appBanWords(); 
+      // calling onChange() when appBanWords changes
+      untracked(() => this.onChange());
+    });
+  }
 
   validate(control: AbstractControl<string>): ValidationErrors | null {
-    const foundBannedWord = this.bannedWords.find(word => word.toLowerCase() === control.value?.toLowerCase());
+    const foundBannedWord = this.appBanWords().find(word => word.toLowerCase() === control.value?.toLowerCase());
     return !foundBannedWord
       ? null
       : { appBanWords: { bannedWord: foundBannedWord } }

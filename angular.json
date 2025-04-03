@@ -20,7 +20,6 @@
             "outputPath": "dist/forms-playground",
             "index": "projects/forms-playground/src/index.html",
             "main": "projects/forms-playground/src/main.ts",
-            "polyfills": "projects/forms-playground/src/polyfills.ts",
             "tsConfig": "projects/forms-playground/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
